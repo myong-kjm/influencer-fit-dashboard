@@ -246,7 +246,7 @@ if st.session_state._collect_cmd is not None:
 
 raw_df = load_data()
 
-st.title("인플루언서 인게이지먼트 핏 분석")
+st.title("대시보드")
 
 if raw_df.empty:
     st.info(
