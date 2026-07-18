@@ -160,8 +160,8 @@ def apply_score(df: pd.DataFrame, tier_target: set[str]) -> pd.DataFrame:
 
 @st.dialog("계정 수집 중")
 def run_collect_dialog(cmd: list[str]) -> None:
-    st.markdown("### ⏳ 공개 정보를 수집하고 있어요")
-    st.caption("차단 방지를 위해 요청 사이 8~20초씩 쉽니다. 창을 닫지 말고 기다려주세요.")
+    st.markdown("### ⏳ 로그인 세션으로 프로필을 방문하고 있어요")
+    st.caption("Chrome 창이 따로 뜨고, 계정 사이 10~25초씩 쉽니다. 창을 닫지 말고 기다려주세요.")
     log_box = st.empty()
     lines: list[str] = []
     rc = -1
@@ -238,7 +238,7 @@ with st.sidebar:
                 cmd = [sys.executable, str(ROOT / "scraper" / "collect.py"), "--add", handle]
                 st.session_state._collect_cmd = cmd
                 st.rerun()
-        st.caption("⚠️ 공개 계정 정보만 조회합니다. 너무 자주/많이 누르면 일시 차단될 수 있어요.")
+        st.caption("⚠️ 본인 인스타그램 로그인 세션으로 프로필을 방문해 수집합니다. 너무 자주/많이 돌리면 계정이 일시 제한될 수 있어요 — 소량으로만 사용하세요.")
 
 if st.session_state._collect_cmd is not None:
     run_collect_dialog(st.session_state._collect_cmd)

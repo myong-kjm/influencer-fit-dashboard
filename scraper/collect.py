@@ -1,4 +1,10 @@
-"""로컬에서 실행: config.json의 인스타그램 계정 목록을 수집해 data/influencers.csv 로 저장.
+"""로컬에서 실행: 본인 Chrome 로그인 세션으로 인스타그램 계정을 방문해
+공개 프로필 정보를 수집하고 data/influencers.csv 로 저장한다.
+
+⚠️ 본인 인스타그램 계정으로 로그인한 세션을 재사용합니다. 자동화 탐지 시
+계정이 일시 제한될 수 있습니다 — 하루 수십 계정 이내로, 계정 사이 충분한
+지연을 두고 소량으로만 사용하세요. 로그인/보안 확인 페이지로 리다이렉트되면
+즉시 전체 수집을 중단합니다.
 
 실행:
     python scraper/collect.py                 # config.json의 influencers 전체 수집
@@ -12,10 +18,9 @@ import json
 import sys
 from pathlib import Path
 
-import requests
+from playwright.sync_api import sync_playwright
 
 if sys.platform == "win32":
-    # 콘솔 기본 인코딩(cp949)에서 한글/특수문자 출력 시 죽지 않도록 강제 UTF-8.
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
@@ -25,13 +30,10 @@ if sys.platform == "win32":
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from scraper.instagram_public import (
-    ProfileNotFound,
-    RateLimited,
-    fetch_profile_raw,
-    parse_profile,
-    sleep_between,
-)
+from scraper import browser as browser_mod
+from scraper.instagram_browser import LoginWallError, ProfileFetchFailed, fetch_profile_via_browser
+from scraper.instagram_public import parse_profile
+from scraper.human_like import between_accounts_pause
 
 CONFIG_PATH = ROOT / "config.json"
 OUT_PATH = ROOT / "data" / "influencers.csv"
@@ -66,35 +68,40 @@ def save_all(rows: dict[str, dict]) -> None:
             writer.writerow({k: rows[username].get(k, "") for k in FIELDNAMES})
 
 
-def collect(usernames: list[str], delay_min: float, delay_max: float) -> None:
+def collect(usernames: list[str], config: dict) -> None:
     existing = load_existing()
-    session = requests.Session()
+    delay_min, delay_max = config.get("request_delay_seconds", [10, 25])
 
-    for i, raw_username in enumerate(usernames):
-        username = raw_username.strip().lstrip("@")
-        if not username:
-            continue
-        print(f"[{i + 1}/{len(usernames)}] @{username} 수집 중...")
+    with sync_playwright() as playwright:
+        context = browser_mod.launch_context(playwright, config)
         try:
-            raw = fetch_profile_raw(username, session)
-            row = parse_profile(username, raw)
-            existing[username] = row
-            print(f"  -> 팔로워 {row['followers']:,} / 인게이지먼트율 {row['engagement_rate']}%")
-        except RateLimited as e:
-            print(f"  [경고] {e}")
-            print("  요청이 차단된 것 같습니다. 여기서 멈추고 잠시 후(가능하면 몇 시간 뒤) 다시 실행하세요.")
-            break
-        except ProfileNotFound as e:
-            print(f"  [실패] {e}")
-            existing[username] = {"username": username, "error": str(e), "collected_at": ""}
-        except requests.RequestException as e:
-            print(f"  [실패] 네트워크 오류: {e}")
-            existing[username] = {"username": username, "error": str(e), "collected_at": ""}
+            for i, raw_username in enumerate(usernames):
+                username = raw_username.strip().lstrip("@")
+                if not username:
+                    continue
+                print(f"[{i + 1}/{len(usernames)}] @{username} 방문 중...")
+                try:
+                    user = fetch_profile_via_browser(context, username)
+                    row = parse_profile(username, user)
+                    existing[username] = row
+                    print(f"  -> 팔로워 {row['followers']:,} / 인게이지먼트율 {row['engagement_rate']}%")
+                except LoginWallError as e:
+                    print(f"  [중단] {e}")
+                    save_all(existing)
+                    return
+                except ProfileFetchFailed as e:
+                    print(f"  [실패] {e}")
+                    existing[username] = {"username": username, "error": str(e), "collected_at": ""}
+                except Exception as e:
+                    print(f"  [실패] 예상치 못한 오류: {e}")
+                    existing[username] = {"username": username, "error": str(e), "collected_at": ""}
 
-        save_all(existing)  # 매 계정마다 저장 — 중간에 멈춰도 데이터 유실 없음
+                save_all(existing)
 
-        if i < len(usernames) - 1:
-            sleep_between(delay_min, delay_max)
+                if i < len(usernames) - 1:
+                    between_accounts_pause(delay_min, delay_max)
+        finally:
+            context.close()
 
     print(f"\n완료 — data/influencers.csv 에 총 {len(existing)}개 계정 저장됨")
 
@@ -110,8 +117,7 @@ def main() -> None:
     else:
         usernames = list(config.get("influencers", []))
 
-    delay = config.get("request_delay_seconds", [8, 20])
-    collect(usernames, delay[0], delay[1])
+    collect(usernames, config)
 
 
 if __name__ == "__main__":

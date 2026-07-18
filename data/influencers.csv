@@ -1,0 +1,3 @@
+﻿username,full_name,biography,category_name,is_verified,is_business_account,is_private,followers,posts_count,sample_posts,avg_likes,avg_comments,engagement_rate,last_post_days_ago,avg_days_between_posts,external_url,collected_at,error
+chipotle,,,,,,,,,,,,,,,,,"@chipotle — 프로필 데이터를 가져오지 못했습니다 (존재하지 않는 계정이거나, 비공개 계정이거나, 응답 캡처 실패)"
+nike,Nike,Just Do It.,,True,True,False,291771638,1664,12,679296.8,8417.2,0.24,0.9,5.2,http://empli.fi/nike,2026-07-18T12:48:39+00:00,
