@@ -119,13 +119,14 @@ st.markdown(
     }
     .panel-label-accent { color: var(--accent); }
 
-    /* 사이드바 헤더 */
-    .sidebar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
-    .sidebar-brand-emoji { font-size: 1.3rem; line-height: 1; }
+    /* 사이드바 헤더 — 메인 타이틀(대시보드)과 동일한 폰트 크기 */
+    .sidebar-brand { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 2px; }
+    .sidebar-brand-emoji { font-size: 1.3rem; line-height: 1.2; padding-top: 4px; }
     [data-testid="stSidebar"] .sidebar-title {
         margin: 0; font-family: 'Pretendard', -apple-system, sans-serif;
-        font-weight: 800; font-size: 1.32rem; line-height: 1.2;
-        letter-spacing: -0.6px; color: var(--ink-primary);
+        font-weight: 800; font-size: 44px; line-height: 1.15;
+        letter-spacing: -1px; color: var(--ink-primary);
+        word-break: keep-all; overflow-wrap: normal;
     }
     .sidebar-subtitle {
         color: var(--ink-secondary); font-size: 0.86rem; line-height: 1.5;
