@@ -63,6 +63,7 @@ st.markdown(
 
     [data-testid="stMain"] button:not([role="tab"]),
     [data-testid="stMain"] button:not([role="tab"]) * { color: #fafafa !important; }
+    [data-testid="stExpander"] button, [data-testid="stExpander"] button * { color: #212121 !important; }
     [data-testid="stHeader"] a, [data-testid="stHeader"] span, [data-testid="stHeader"] button {
         color: #1a1a1a !important;
     }
@@ -272,10 +273,22 @@ c2.metric("평균 인게이지먼트율", f"{valid_df['engagement_rate'].mean():
 c3.metric("키워드 매칭 계정", f"{(valid_df['matched_keywords'].apply(len) > 0).sum()}개")
 c4.metric("활발 게시 계정", f"{valid_df['activity'].isin(['매우 활발', '활발']).sum()}개")
 
-failed = df[df["error"] != ""]
+if "dismissed_errors" not in st.session_state:
+    st.session_state.dismissed_errors = set()
+
+failed = df[(df["error"] != "") & (~df["username"].isin(st.session_state.dismissed_errors))]
 if not failed.empty:
     with st.expander(f"⚠️ 수집 실패 {len(failed)}건"):
-        st.dataframe(failed[["username", "error"]], width="stretch", hide_index=True)
+        for _, row in failed.iterrows():
+            col_user, col_err, col_btn = st.columns([1.2, 4.5, 0.5])
+            with col_user:
+                st.write(f"**{row['username']}**")
+            with col_err:
+                st.caption(row["error"])
+            with col_btn:
+                if st.button("확인", key=f"dismiss_{row['username']}", width="content"):
+                    st.session_state.dismissed_errors.add(row["username"])
+                    st.rerun()
 
 st.divider()
 
