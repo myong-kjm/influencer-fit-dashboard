@@ -84,7 +84,7 @@ st.markdown(
     [data-testid="stSidebar"] .sidebar-title {
         margin: 4px 0 18px 0; font-family: 'Pretendard', -apple-system, sans-serif;
         font-weight: 800; font-size: 1.5rem; line-height: 1.15;
-        letter-spacing: -1px; color: #ffffff;
+        letter-spacing: -1px; color: #212121;
     }
     [data-testid="stMain"] button[role="tab"], [data-testid="stMain"] button[role="tab"] *,
     [data-testid="stMain"] [data-baseweb="tab-list"] button,
@@ -194,7 +194,7 @@ if "_collect_cmd" not in st.session_state:
     st.session_state._collect_cmd = None
 
 with st.sidebar:
-    st.markdown('<p class="sidebar-title">🎯 인플루언서 핏 분석</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sidebar-title">IG 계정 분석기</p>', unsafe_allow_html=True)
     st.caption("인플루언서 컨택 전, 브랜드와 잘 맞는 계정을 데이터로 골라내는 도구예요.")
 
     st.markdown("**브랜드 키워드**")
