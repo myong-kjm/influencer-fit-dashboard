@@ -45,7 +45,7 @@ FIELDNAMES = [
     "avg_likes", "avg_comments", "engagement_rate",
     "avg_views", "video_sample_posts",
     "last_post_days_ago", "avg_days_between_posts",
-    "external_url", "collected_at", "error",
+    "external_url", "collected_at", "error", "contact_status",
 ]
 
 
@@ -81,9 +81,11 @@ def collect(usernames: list[str], config: dict) -> None:
                 if not username:
                     continue
                 print(f"[{i + 1}/{len(usernames)}] @{username} 방문 중...")
+                prev_contact_status = existing.get(username, {}).get("contact_status", "")
                 try:
                     user = fetch_profile_via_browser(context, username)
                     row = parse_profile(username, user)
+                    row["contact_status"] = prev_contact_status
                     existing[username] = row
                     print(f"  -> 팔로워 {row['followers']:,} / 인게이지먼트율 {row['engagement_rate']}%")
                 except LoginWallError as e:
@@ -92,10 +94,10 @@ def collect(usernames: list[str], config: dict) -> None:
                     return
                 except ProfileFetchFailed as e:
                     print(f"  [실패] {e}")
-                    existing[username] = {"username": username, "error": str(e), "collected_at": ""}
+                    existing[username] = {"username": username, "error": str(e), "collected_at": "", "contact_status": prev_contact_status}
                 except Exception as e:
                     print(f"  [실패] 예상치 못한 오류: {e}")
-                    existing[username] = {"username": username, "error": str(e), "collected_at": ""}
+                    existing[username] = {"username": username, "error": str(e), "collected_at": "", "contact_status": prev_contact_status}
 
                 save_all(existing)
 

@@ -21,6 +21,8 @@ from dashboard import scoring
 DATA_PATH = ROOT / "data" / "influencers.csv"
 CONFIG_PATH = ROOT / "config.json"
 
+CONTACT_OPTIONS = ["컨택예정", "컨택완료", "미진행"]
+
 # 클라우드(Streamlit Community Cloud)에서는 계정 추가/수집을 막고 조회만 허용한다.
 # 이유: Instagram이 클라우드 공용 IP 대역을 훨씬 빨리 차단하고, 여러 사람이
 # 동시에 실행하면 순식간에 요청 제한에 걸리기 때문 — 수집은 항상 로컬에서.
@@ -129,7 +131,22 @@ def load_data() -> pd.DataFrame:
     df["biography"] = df.get("biography", "").fillna("")
     df["category_name"] = df.get("category_name", "").fillna("")
     df["error"] = df.get("error", "").fillna("")
+
+    if "contact_status" not in df.columns:
+        df["contact_status"] = ""
+    df["contact_status"] = df["contact_status"].fillna("")
+    df.loc[~df["contact_status"].isin(CONTACT_OPTIONS), "contact_status"] = "미진행"
     return df
+
+
+def save_contact_status(username: str, status: str) -> None:
+    if not DATA_PATH.exists():
+        return
+    raw = pd.read_csv(DATA_PATH, encoding="utf-8-sig")
+    if "contact_status" not in raw.columns:
+        raw["contact_status"] = ""
+    raw.loc[raw["username"] == username, "contact_status"] = status
+    raw.to_csv(DATA_PATH, index=False, encoding="utf-8-sig")
 
 
 def enrich(df: pd.DataFrame, keywords: list[str]) -> pd.DataFrame:
@@ -297,7 +314,7 @@ if not failed.empty:
 
 st.divider()
 
-tab_rank, tab_chart, tab_detail = st.tabs(["🏆 핏 스코어 순위", "📊 인게이지먼트 분포", "👤 상세 프로필"])
+tab_rank, tab_chart, tab_detail = st.tabs(["🏆 순위", "📊 인게이지먼트 분포", "👤 상세 프로필"])
 
 with tab_rank:
     if filtered.empty:
@@ -305,7 +322,7 @@ with tab_rank:
     else:
         table = filtered[[
             "username", "followers", "tier", "engagement_rate", "avg_views",
-            "matched_keywords_str", "activity", "fit_score",
+            "matched_keywords_str", "activity", "fit_score", "contact_status",
         ]].copy()
         table["프로필"] = "https://instagram.com/" + filtered["username"]
         table = table.rename(columns={
@@ -313,19 +330,29 @@ with tab_rank:
             "engagement_rate": "인게이지먼트율(%)", "avg_views": "평균 조회수",
             "matched_keywords_str": "매칭 키워드",
             "activity": "게시 활발도", "fit_score": "핏 스코어",
+            "contact_status": "컨택여부",
         })
-        st.dataframe(
+        edited_table = st.data_editor(
             table, width="stretch", height=460, hide_index=True,
+            disabled=[c for c in table.columns if c != "컨택여부"],
             column_config={
                 "핏 스코어": st.column_config.ProgressColumn("핏 스코어", min_value=0, max_value=100, format="%.1f"),
                 "팔로워": st.column_config.NumberColumn("팔로워", format="%d"),
                 "평균 조회수": st.column_config.NumberColumn("평균 조회수", format="%d", help="최근 영상(릴스) 게시물 기준 · 참고용, 인게이지먼트율 계산에는 미포함"),
                 "프로필": st.column_config.LinkColumn("프로필", display_text="🔗 인스타 열기"),
+                "컨택여부": st.column_config.SelectboxColumn("컨택여부", options=CONTACT_OPTIONS, required=True),
             },
+            key="rank_table_editor",
         )
+        changed = edited_table[edited_table["컨택여부"] != table["컨택여부"]]
+        if not changed.empty:
+            for _, r in changed.iterrows():
+                save_contact_status(r["계정"], r["컨택여부"])
+            st.rerun()
+
         st.download_button(
             "⬇️ 현재 목록 CSV로 내려받기 (컨택 후보 리스트)",
-            data=table.to_csv(index=False).encode("utf-8-sig"),
+            data=edited_table.to_csv(index=False).encode("utf-8-sig"),
             file_name="influencer_shortlist.csv",
             mime="text/csv",
             type="primary",
