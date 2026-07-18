@@ -347,8 +347,7 @@ with st.sidebar:
         '<div class="sidebar-brand">'
         '<span class="sidebar-brand-emoji">💛</span>'
         '<span class="sidebar-title">IG 계정 분석기</span>'
-        '</div>'
-        '<p class="sidebar-subtitle">인플루언서 컨택 전, 브랜드와 잘 맞는 계정을 데이터로 골라내는 도구예요.</p>',
+        '</div>',
         unsafe_allow_html=True,
     )
 
