@@ -63,7 +63,8 @@ st.markdown(
 
     [data-testid="stMain"] button:not([role="tab"]),
     [data-testid="stMain"] button:not([role="tab"]) * { color: #fafafa !important; }
-    [data-testid="stExpander"] button, [data-testid="stExpander"] button * { color: #212121 !important; }
+    [data-testid="stMain"] [data-testid="stExpander"] [data-testid="stButton"] button,
+    [data-testid="stMain"] [data-testid="stExpander"] [data-testid="stButton"] button * { color: #212121 !important; }
     [data-testid="stHeader"] a, [data-testid="stHeader"] span, [data-testid="stHeader"] button {
         color: #1a1a1a !important;
     }
