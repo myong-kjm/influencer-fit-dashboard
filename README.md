@@ -61,16 +61,24 @@
 
 브랜드 키워드는 대시보드 사이드바에서 바로 수정할 수 있고, `config.json` 에 저장됩니다.
 
+평균 조회수(영상/릴스 게시물 기준)는 참고용 지표로만 표시되며 핏 스코어 계산에는 포함되지 않습니다.
+
+## 컨택 진행 관리
+
+순위표에서 계정별로 "컨택여부"를 컨택예정/컨택완료/미진행 중에서 바로 선택할 수 있습니다.
+선택 즉시 `data/influencers.csv` 에 저장되어 다음 접속·재수집 시에도 유지됩니다.
+
 ## 파일 구조
 
 ```
 config.json                  브랜드 키워드, 수집 대상 계정 목록, Chrome 프로필 설정, 요청 지연 시간
+.streamlit/config.toml       테마 색상, 개발자 메뉴 숨김 설정
 scraper/browser.py           본인 Chrome 프로필로 Playwright 브라우저 세션 실행
 scraper/human_like.py        지연/스크롤/마우스 등 사람형 행동 시뮬레이션
 scraper/instagram_browser.py 프로필 페이지 방문 + 네트워크 응답 캡처
 scraper/instagram_public.py  캡처한 응답을 정리된 필드로 파싱
 scraper/collect.py           수집 실행 스크립트 (CLI)
 dashboard/scoring.py         핏 스코어 계산 로직
-dashboard/app.py             Streamlit 대시보드 화면
-data/influencers.csv         수집 결과 (자동 생성)
+dashboard/app.py             Streamlit 대시보드 화면 (UI + 컨택여부 저장 포함)
+data/influencers.csv         수집 결과 + 컨택여부 (자동 생성/갱신)
 ```
