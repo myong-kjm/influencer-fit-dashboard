@@ -304,13 +304,14 @@ with tab_rank:
         st.info("조건에 맞는 계정이 없어요. 필터를 완화해보세요.")
     else:
         table = filtered[[
-            "username", "followers", "tier", "engagement_rate",
+            "username", "followers", "tier", "engagement_rate", "avg_views",
             "matched_keywords_str", "activity", "fit_score",
         ]].copy()
         table["프로필"] = "https://instagram.com/" + filtered["username"]
         table = table.rename(columns={
             "username": "계정", "followers": "팔로워", "tier": "구간",
-            "engagement_rate": "인게이지먼트율(%)", "matched_keywords_str": "매칭 키워드",
+            "engagement_rate": "인게이지먼트율(%)", "avg_views": "평균 조회수",
+            "matched_keywords_str": "매칭 키워드",
             "activity": "게시 활발도", "fit_score": "핏 스코어",
         })
         st.dataframe(
@@ -318,6 +319,7 @@ with tab_rank:
             column_config={
                 "핏 스코어": st.column_config.ProgressColumn("핏 스코어", min_value=0, max_value=100, format="%.1f"),
                 "팔로워": st.column_config.NumberColumn("팔로워", format="%d"),
+                "평균 조회수": st.column_config.NumberColumn("평균 조회수", format="%d", help="최근 영상(릴스) 게시물 기준 · 참고용, 인게이지먼트율 계산에는 미포함"),
                 "프로필": st.column_config.LinkColumn("프로필", display_text="🔗 인스타 열기"),
             },
         )
