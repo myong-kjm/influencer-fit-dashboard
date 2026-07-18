@@ -394,3 +394,9 @@ with tab_detail:
             st.write(f"좋아요 {row['avg_likes']:,.0f}회 · 댓글 {row['avg_comments']:,.0f}개  ({int(row['sample_posts'])}개 게시물 기준)")
             st.markdown("**게시 활발도**")
             st.write(row["activity"])
+
+            last_post = row["last_post_days_ago"]
+            avg_gap = row["avg_days_between_posts"]
+            act1, act2 = st.columns(2)
+            act1.metric("최근 업로드", "정보 없음" if pd.isna(last_post) else f"{last_post:.1f}일 전")
+            act2.metric("평균 업로드 주기", "정보 없음" if pd.isna(avg_gap) else f"{avg_gap:.1f}일마다")
