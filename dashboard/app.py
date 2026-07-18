@@ -119,9 +119,13 @@ def load_data() -> pd.DataFrame:
     if df.empty:
         return df
     for col in ["followers", "posts_count", "avg_likes", "avg_comments", "engagement_rate"]:
-        df[col] = pd.to_numeric(df.get(col), errors="coerce").fillna(0)
-    for col in ["last_post_days_ago", "avg_days_between_posts"]:
-        df[col] = pd.to_numeric(df.get(col), errors="coerce")
+        if col not in df.columns:
+            df[col] = 0
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    for col in ["last_post_days_ago", "avg_days_between_posts", "avg_views", "video_sample_posts"]:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = pd.to_numeric(df[col], errors="coerce")
     df["biography"] = df.get("biography", "").fillna("")
     df["category_name"] = df.get("category_name", "").fillna("")
     df["error"] = df.get("error", "").fillna("")
@@ -393,6 +397,12 @@ with tab_detail:
                 st.markdown(" ".join(f"`{k}`" for k in kws))
             st.markdown("**최근 게시물 기준 평균**")
             st.write(f"좋아요 {row['avg_likes']:,.0f}회 · 댓글 {row['avg_comments']:,.0f}개  ({int(row['sample_posts'])}개 게시물 기준)")
+            avg_views = row["avg_views"]
+            video_n = row["video_sample_posts"]
+            if pd.isna(avg_views):
+                st.caption("평균 조회수: 정보 없음 (최근 게시물 중 영상이 없음)")
+            else:
+                st.caption(f"평균 조회수 {avg_views:,.0f}회  (영상 게시물 {int(video_n)}개 기준 · 참고용, 인게이지먼트율 계산에는 미포함)")
             st.markdown("**게시 활발도**")
             st.write(row["activity"])
 

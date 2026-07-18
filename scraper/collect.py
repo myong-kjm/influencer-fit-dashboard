@@ -43,6 +43,7 @@ FIELDNAMES = [
     "is_verified", "is_business_account", "is_private",
     "followers", "posts_count", "sample_posts",
     "avg_likes", "avg_comments", "engagement_rate",
+    "avg_views", "video_sample_posts",
     "last_post_days_ago", "avg_days_between_posts",
     "external_url", "collected_at", "error",
 ]

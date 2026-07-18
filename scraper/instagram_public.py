@@ -77,6 +77,14 @@ def parse_profile(username: str, user: dict) -> dict:
         round((avg_likes + avg_comments) / followers * 100, 2) if followers else 0.0
     )
 
+    # 조회수는 영상(릴스) 게시물에만 존재 — 참고용 지표로만 별도 집계 (인게이지먼트율 계산에는 미포함)
+    views = [
+        n.get("video_view_count") for n in recent
+        if n.get("is_video") and n.get("video_view_count") is not None
+    ]
+    avg_views = round(sum(views) / len(views), 1) if views else ""
+    video_sample_posts = len(views)
+
     last_post_days_ago = ""
     avg_days_between_posts = ""
     if timestamps:
@@ -103,6 +111,8 @@ def parse_profile(username: str, user: dict) -> dict:
         "avg_likes": avg_likes,
         "avg_comments": avg_comments,
         "engagement_rate": engagement_rate,
+        "avg_views": avg_views,
+        "video_sample_posts": video_sample_posts,
         "last_post_days_ago": last_post_days_ago,
         "avg_days_between_posts": avg_days_between_posts,
         "external_url": user.get("external_url") or "",
