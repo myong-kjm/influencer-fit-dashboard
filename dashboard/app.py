@@ -47,57 +47,183 @@ st.markdown(
     """
     <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+    /* ============================================================
+       디자인 토큰 — 8px 그리드 기준 간격, 반경, 색상
+       ============================================================ */
+    :root {
+        --sp-1: 8px;  --sp-2: 16px; --sp-3: 24px; --sp-4: 32px; --sp-5: 40px; --sp-6: 48px;
+        --radius-card: 12px;
+        --radius-control: 8px;
+        --border-color: #e6e3e3;
+        --ink-primary: #1a1a1a;
+        --ink-secondary: #62605c;
+        --ink-muted: #8a8781;
+        --surface-card: #ffffff;
+        --surface-page: #F5F4F2;
+        --accent: #E5484D;
+    }
+
     html, body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif !important; }
-    .block-container { padding-top: 3.5rem; }
-    [data-testid="stSidebar"] { min-width: 320px; }
-    div[data-testid="stMetricValue"] { font-size: 1.55rem; }
+
+    /* ============================================================
+       레이아웃 기본 골격 — 페이지/사이드바 여백을 8px 그리드로 통일
+       ============================================================ */
+    .block-container {
+        padding: var(--sp-5) var(--sp-6) var(--sp-6) !important;
+        max-width: 1280px;
+    }
+    [data-testid="stSidebar"] { min-width: 336px; }
+    [data-testid="stSidebarUserContent"] {
+        padding: var(--sp-4) var(--sp-3) var(--sp-4) !important;
+    }
+    [data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"] {
+        gap: var(--sp-3) !important;
+    }
+    [data-testid="stMain"] [data-testid="stVerticalBlock"] { gap: var(--sp-2) !important; }
 
     [data-testid="stMain"], section.main,
     [data-testid="stAppViewContainer"] > .main,
-    [data-testid="stHeader"] { background: #F5F3F3 !important; }
+    [data-testid="stHeader"] { background: var(--surface-page) !important; }
+    [data-testid="stSidebar"] { background: var(--surface-card) !important; border-right: 1px solid var(--border-color); }
+
     [data-testid="stMain"] h1, [data-testid="stMain"] h2, [data-testid="stMain"] h3,
     [data-testid="stMain"] h4,
     [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
     [data-testid="stMain"] [data-testid="stMetricLabel"],
     [data-testid="stMain"] [data-testid="stMetricValue"],
-    [data-testid="stMain"] [data-baseweb="tab"] > div { color: #1a1a1a !important; }
-    [data-testid="stMain"] [data-testid="stCaptionContainer"] { color: #555 !important; }
+    [data-testid="stMain"] [data-baseweb="tab"] > div { color: var(--ink-primary) !important; }
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: var(--ink-secondary) !important; }
 
+    /* ============================================================
+       타이포그래피 계층 — 페이지 타이틀 / 섹션 타이틀 / 패널 라벨
+       ============================================================ */
+    [data-testid="stMain"] h1, [data-testid="stSidebar"] h1 {
+        font-family: 'Pretendard', -apple-system, sans-serif !important;
+        font-weight: 800 !important; letter-spacing: -0.5px;
+    }
+    [data-testid="stMain"] h1 { margin-bottom: 4px !important; }
+    .page-subtitle { color: var(--ink-secondary); font-size: 0.92rem; margin: 0 0 var(--sp-4) 0; }
+    .section-title {
+        font-weight: 700; font-size: 1.05rem; color: var(--ink-primary);
+        margin: 0 0 var(--sp-2) 0; letter-spacing: -0.2px;
+    }
+    .panel-label {
+        font-weight: 700; font-size: 0.78rem; letter-spacing: 0.3px;
+        color: var(--ink-muted); text-transform: uppercase;
+        margin: 0 0 var(--sp-1) 0;
+    }
+    .panel-label-accent { color: var(--accent); }
+
+    /* 사이드바 헤더 */
+    .sidebar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+    .sidebar-brand-emoji { font-size: 1.3rem; line-height: 1; }
+    [data-testid="stSidebar"] .sidebar-title {
+        margin: 0; font-family: 'Pretendard', -apple-system, sans-serif;
+        font-weight: 800; font-size: 1.32rem; line-height: 1.2;
+        letter-spacing: -0.6px; color: var(--ink-primary);
+    }
+    .sidebar-subtitle {
+        color: var(--ink-secondary); font-size: 0.86rem; line-height: 1.5;
+        margin: var(--sp-1) 0 0 0;
+    }
+
+    /* ============================================================
+       버튼 — 크기/반경/두께 통일 (탭 버튼은 제외)
+       ============================================================ */
+    [data-testid="stMain"] button:not([role="tab"]),
+    [data-testid="stSidebar"] button {
+        border-radius: var(--radius-control) !important;
+        font-weight: 600 !important;
+        min-height: 40px;
+    }
     [data-testid="stMain"] button:not([role="tab"]),
     [data-testid="stMain"] button:not([role="tab"]) * { color: #fafafa !important; }
     [data-testid="stMain"] [data-testid="stExpander"] [data-testid="stButton"] button,
     [data-testid="stMain"] [data-testid="stExpander"] [data-testid="stButton"] button * { color: #212121 !important; }
     [data-testid="stHeader"] a, [data-testid="stHeader"] span, [data-testid="stHeader"] button {
-        color: #1a1a1a !important;
+        color: var(--ink-primary) !important;
     }
 
-    [data-testid="stMain"] [data-testid="stMetric"] {
-        background: #ffffff; border: 1px solid #e6e3e3; border-radius: 14px;
-        padding: 18px 22px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    /* ============================================================
+       입력 요소 — text_input / selectbox / multiselect / slider 반경 통일
+       ============================================================ */
+    [data-testid="stTextInput"] input,
+    [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+    [data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
+        border-radius: var(--radius-control) !important;
+        min-height: 40px !important;
     }
+
+    /* ============================================================
+       카드형 컨테이너 (st.container(border=True, key=...)) — 그룹 구분을 명확하게
+       Streamlit이 border/key 스타일을 stVerticalBlock 자체에 적용하므로 그걸 직접 타겟팅
+       ============================================================ */
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"][class*="st-key-"] {
+        border-radius: var(--radius-card) !important;
+        border-color: var(--border-color) !important;
+        background: var(--surface-page) !important;
+        padding: var(--sp-2) !important;
+        gap: var(--sp-2) !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stExpander"] { border-radius: var(--radius-card) !important; }
+
+    /* 메인 영역의 카드형 컨테이너 (상세 프로필 등) — 흰 배경으로 페이지와 구분 */
+    [data-testid="stMain"] [data-testid="stVerticalBlock"][class*="st-key-"] {
+        border-radius: var(--radius-card) !important;
+        border-color: var(--border-color) !important;
+        background: var(--surface-card) !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        padding: var(--sp-3) !important;
+        gap: var(--sp-2) !important;
+    }
+
+    /* "계정 추가" 패널 강조 — 이 앱에서 유일한 데이터 입력 지점 */
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"].st-key-add-account-panel {
+        background: #FDEDEC !important;
+        border: 1.5px solid #F3B6B4 !important;
+    }
+
+    /* ============================================================
+       지표 카드 (st.metric) — 패딩/반경 통일
+       ============================================================ */
+    [data-testid="stMain"] [data-testid="stMetric"] {
+        background: var(--surface-card); border: 1px solid var(--border-color);
+        border-radius: var(--radius-card);
+        padding: var(--sp-3); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    div[data-testid="stMetricValue"] { font-size: 1.5rem; }
     [data-testid="stMain"] [data-testid="stMetric"] [data-testid="stMetricLabel"] {
-        color: #6b6b6b !important; font-size: 0.85rem;
+        color: var(--ink-secondary) !important; font-size: 0.82rem;
     }
     [data-testid="stMain"] [data-testid="stMetric"] [data-testid="stMetricValue"] {
         color: #111 !important; font-weight: 700;
     }
-    [data-testid="stMain"] h1, [data-testid="stSidebar"] h1 {
-        font-family: 'Pretendard', -apple-system, sans-serif !important;
-        font-weight: 800 !important; letter-spacing: -0.5px;
-    }
-    [data-testid="stSidebar"] .sidebar-title {
-        margin: 4px 0 18px 0; font-family: 'Pretendard', -apple-system, sans-serif;
-        font-weight: 800; font-size: 1.5rem; line-height: 1.15;
-        letter-spacing: -1px; color: #212121;
-    }
+
+    /* ============================================================
+       탭 — 여백/굵기 통일, 콘텐츠 상단 간격 확보
+       ============================================================ */
     [data-testid="stMain"] button[role="tab"], [data-testid="stMain"] button[role="tab"] *,
     [data-testid="stMain"] [data-baseweb="tab-list"] button,
     [data-testid="stMain"] [data-baseweb="tab-list"] button * {
-        color: #1a1a1a !important; font-size: 1.05rem !important; font-weight: 700 !important;
+        color: var(--ink-primary) !important; font-size: 1.0rem !important; font-weight: 700 !important;
     }
     [data-testid="stMain"] button[role="tab"][aria-selected="false"],
-    [data-testid="stMain"] button[role="tab"][aria-selected="false"] * { color: #6b6b6b !important; }
-    [data-testid="stMain"] [data-baseweb="tab-list"] { border-bottom: 1px solid #d6d3d3 !important; }
+    [data-testid="stMain"] button[role="tab"][aria-selected="false"] * { color: var(--ink-muted) !important; }
+    [data-testid="stMain"] [data-baseweb="tab-list"] { border-bottom: 1px solid #d6d3d3 !important; gap: var(--sp-4) !important; }
+    [data-testid="stMain"] [data-baseweb="tab-panel"] { padding-top: var(--sp-3) !important; }
+
+    /* ============================================================
+       데이터 테이블/카드 컨테이너 공통 반경
+       ============================================================ */
+    [data-testid="stDataFrame"], [data-testid="stDataEditor"] {
+        border-radius: var(--radius-card) !important; overflow: hidden;
+        border: 1px solid var(--border-color) !important;
+    }
+    [data-testid="stExpander"] {
+        border-radius: var(--radius-card) !important; border-color: var(--border-color) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -217,51 +343,62 @@ if "_collect_cmd" not in st.session_state:
     st.session_state._collect_cmd = None
 
 with st.sidebar:
-    st.markdown('<p class="sidebar-title">💛 IG 계정 분석기</p>', unsafe_allow_html=True)
-    st.caption("인플루언서 컨택 전, 브랜드와 잘 맞는 계정을 데이터로 골라내는 도구예요.")
-
-    st.markdown("**브랜드 키워드**")
-    kw_input = st.text_input(
-        "쉼표로 구분해서 입력",
-        value=", ".join(config.get("brand_keywords", [])),
-        label_visibility="collapsed",
-        help="계정 소개글(bio)·카테고리에 이 단어가 있으면 핏 스코어가 올라가요",
+    st.markdown(
+        '<div class="sidebar-brand">'
+        '<span class="sidebar-brand-emoji">💛</span>'
+        '<span class="sidebar-title">IG 계정 분석기</span>'
+        '</div>'
+        '<p class="sidebar-subtitle">인플루언서 컨택 전, 브랜드와 잘 맞는 계정을 데이터로 골라내는 도구예요.</p>',
+        unsafe_allow_html=True,
     )
-    keywords = [k.strip() for k in kw_input.split(",") if k.strip()]
-    if keywords != config.get("brand_keywords", []):
-        config["brand_keywords"] = keywords
-        save_config(config)
 
-    st.markdown("---")
-    tier_target = set(
-        st.multiselect(
-            "팔로워 구간 (타겟)",
-            options=scoring.TIER_ORDER,
-            default=[],
-            help="비워두면 전체 구간을 동일하게 취급해요. 선택하면 그 구간에 가산점을 줘요.",
+    with st.container(border=True, key="kw-panel"):
+        st.markdown('<p class="panel-label">브랜드 키워드</p>', unsafe_allow_html=True)
+        kw_input = st.text_input(
+            "쉼표로 구분해서 입력",
+            value=", ".join(config.get("brand_keywords", [])),
+            label_visibility="collapsed",
+            help="계정 소개글(bio)·카테고리에 이 단어가 있으면 핏 스코어가 올라가요",
         )
-    )
-    min_engagement = st.slider("최소 인게이지먼트율 (%)", 0.0, 15.0, 0.0, 0.1)
-    sort_by = st.selectbox("정렬 기준", ["핏 스코어", "인게이지먼트율", "팔로워 수"])
+        keywords = [k.strip() for k in kw_input.split(",") if k.strip()]
+        if keywords != config.get("brand_keywords", []):
+            config["brand_keywords"] = keywords
+            save_config(config)
 
-    st.markdown("---")
-    st.markdown("**계정 추가**")
-    if IS_CLOUD:
-        st.info("☁️ 클라우드에서는 조회만 가능해요. 계정 추가·수집은 로컬 PC에서 실행한 뒤 PUSH-Update.bat으로 반영하세요.")
-    else:
-        new_handle = st.text_input("인스타그램 아이디 (@ 제외)", key="new_handle_input")
-        if st.button("➕ 추가 + 지금 수집", type="primary", width="stretch"):
-            handle = new_handle.strip().lstrip("@")
-            if not handle:
-                st.error("아이디를 입력해주세요.")
-            else:
-                if handle not in config.get("influencers", []):
-                    config.setdefault("influencers", []).append(handle)
-                    save_config(config)
-                cmd = [sys.executable, str(ROOT / "scraper" / "collect.py"), "--add", handle]
-                st.session_state._collect_cmd = cmd
-                st.rerun()
-        st.caption("⚠️ 본인 인스타그램 로그인 세션으로 프로필을 방문해 수집합니다. 너무 자주/많이 돌리면 계정이 일시 제한될 수 있어요 — 소량으로만 사용하세요.")
+    with st.container(border=True, key="filter-panel"):
+        st.markdown('<p class="panel-label">필터 &amp; 정렬</p>', unsafe_allow_html=True)
+        tier_target = set(
+            st.multiselect(
+                "팔로워 구간 (타겟)",
+                options=scoring.TIER_ORDER,
+                default=[],
+                help="비워두면 전체 구간을 동일하게 취급해요. 선택하면 그 구간에 가산점을 줘요.",
+            )
+        )
+        min_engagement = st.slider("최소 인게이지먼트율 (%)", 0.0, 15.0, 0.0, 0.1)
+        sort_by = st.selectbox("정렬 기준", ["핏 스코어", "인게이지먼트율", "팔로워 수"])
+
+    with st.container(border=True, key="add-account-panel"):
+        st.markdown('<p class="panel-label panel-label-accent">➕ 새 계정 추가</p>', unsafe_allow_html=True)
+        if IS_CLOUD:
+            st.info("☁️ 클라우드에서는 조회만 가능해요. 계정 추가·수집은 로컬 PC에서 실행한 뒤 PUSH-Update.bat으로 반영하세요.")
+        else:
+            new_handle = st.text_input(
+                "인스타그램 아이디", key="new_handle_input",
+                placeholder="예: nike (@ 제외)", label_visibility="collapsed",
+            )
+            if st.button("➕ 추가 + 지금 수집", type="primary", width="stretch"):
+                handle = new_handle.strip().lstrip("@")
+                if not handle:
+                    st.error("아이디를 입력해주세요.")
+                else:
+                    if handle not in config.get("influencers", []):
+                        config.setdefault("influencers", []).append(handle)
+                        save_config(config)
+                    cmd = [sys.executable, str(ROOT / "scraper" / "collect.py"), "--add", handle]
+                    st.session_state._collect_cmd = cmd
+                    st.rerun()
+            st.caption("⚠️ 본인 인스타그램 로그인 세션으로 프로필을 방문해 수집합니다. 너무 자주/많이 돌리면 계정이 일시 제한될 수 있어요 — 소량으로만 사용하세요.")
 
 if st.session_state._collect_cmd is not None:
     run_collect_dialog(st.session_state._collect_cmd)
@@ -269,6 +406,7 @@ if st.session_state._collect_cmd is not None:
 raw_df = load_data()
 
 st.title("대시보드")
+st.markdown('<p class="page-subtitle">수집된 인스타그램 계정을 브랜드 핏 기준으로 분석합니다.</p>', unsafe_allow_html=True)
 
 if raw_df.empty:
     st.info(
@@ -289,6 +427,7 @@ if tier_target:
 sort_col = {"핏 스코어": "fit_score", "인게이지먼트율": "engagement_rate", "팔로워 수": "followers"}[sort_by]
 filtered = filtered.sort_values(sort_col, ascending=False)
 
+st.markdown('<p class="section-title">요약</p>', unsafe_allow_html=True)
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("분석 계정", f"{len(valid_df)}개")
 c2.metric("평균 인게이지먼트율", f"{valid_df['engagement_rate'].mean():.2f}%" if len(valid_df) else "0%")
@@ -314,6 +453,7 @@ if not failed.empty:
 
 st.divider()
 
+st.markdown('<p class="section-title">분석 결과</p>', unsafe_allow_html=True)
 tab_rank, tab_chart, tab_detail = st.tabs(["🏆 순위", "📊 인게이지먼트 분포", "👤 상세 프로필"])
 
 with tab_rank:
@@ -399,44 +539,48 @@ with tab_detail:
         pick = st.selectbox("계정 선택", options=valid_df["username"].tolist())
         row = valid_df[valid_df["username"] == pick].iloc[0]
 
-        col_a, col_b = st.columns([1, 1.4])
+        col_a, col_b = st.columns([1, 1.3], gap="medium")
         with col_a:
-            st.markdown(f"### @{row['username']}")
-            if row.get("full_name"):
-                st.caption(row["full_name"])
-            if row.get("is_verified"):
-                st.markdown("✅ 인증 계정")
-            st.link_button("📷 인스타그램에서 열기", f"https://instagram.com/{row['username']}", width="stretch")
+            with st.container(border=True, key="profile-card"):
+                st.markdown(f"### @{row['username']}")
+                if row.get("full_name"):
+                    st.caption(row["full_name"])
+                if row.get("is_verified"):
+                    st.markdown("✅ 인증 계정")
+                st.link_button("📷 인스타그램에서 열기", f"https://instagram.com/{row['username']}", width="stretch")
 
-            m1, m2 = st.columns(2)
-            m1.metric("팔로워", f"{int(row['followers']):,}")
-            m2.metric("구간", row["tier"])
-            m3, m4 = st.columns(2)
-            m3.metric("인게이지먼트율", f"{row['engagement_rate']:.2f}%")
-            m4.metric("핏 스코어", f"{row['fit_score']:.1f}")
+                m1, m2 = st.columns(2)
+                m1.metric("팔로워", f"{int(row['followers']):,}")
+                m2.metric("구간", row["tier"])
+                m3, m4 = st.columns(2)
+                m3.metric("인게이지먼트율", f"{row['engagement_rate']:.2f}%")
+                m4.metric("핏 스코어", f"{row['fit_score']:.1f}")
 
         with col_b:
-            st.markdown("**소개(bio)**")
-            st.write(row["biography"] or "_(비어 있음)_")
-            if row.get("category_name"):
-                st.caption(f"카테고리: {row['category_name']}")
-            kws = row["matched_keywords"]
-            if kws:
-                st.markdown("**매칭된 브랜드 키워드**")
-                st.markdown(" ".join(f"`{k}`" for k in kws))
-            st.markdown("**최근 게시물 기준 평균**")
-            st.write(f"좋아요 {row['avg_likes']:,.0f}회 · 댓글 {row['avg_comments']:,.0f}개  ({int(row['sample_posts'])}개 게시물 기준)")
-            avg_views = row["avg_views"]
-            video_n = row["video_sample_posts"]
-            if pd.isna(avg_views):
-                st.caption("평균 조회수: 정보 없음 (최근 게시물 중 영상이 없음)")
-            else:
-                st.caption(f"평균 조회수 {avg_views:,.0f}회  (영상 게시물 {int(video_n)}개 기준 · 참고용, 인게이지먼트율 계산에는 미포함)")
-            st.markdown("**게시 활발도**")
-            st.write(row["activity"])
+            with st.container(border=True, key="detail-card"):
+                st.markdown('<p class="panel-label">소개(BIO)</p>', unsafe_allow_html=True)
+                st.write(row["biography"] or "_(비어 있음)_")
+                if row.get("category_name"):
+                    st.caption(f"카테고리: {row['category_name']}")
 
-            last_post = row["last_post_days_ago"]
-            avg_gap = row["avg_days_between_posts"]
-            act1, act2 = st.columns(2)
-            act1.metric("최근 업로드", "정보 없음" if pd.isna(last_post) else f"{last_post:.1f}일 전")
-            act2.metric("평균 업로드 주기", "정보 없음" if pd.isna(avg_gap) else f"{avg_gap:.1f}일마다")
+                kws = row["matched_keywords"]
+                if kws:
+                    st.markdown('<p class="panel-label">매칭된 브랜드 키워드</p>', unsafe_allow_html=True)
+                    st.markdown(" ".join(f"`{k}`" for k in kws))
+
+                st.markdown('<p class="panel-label">최근 게시물 기준 평균</p>', unsafe_allow_html=True)
+                st.write(f"좋아요 {row['avg_likes']:,.0f}회 · 댓글 {row['avg_comments']:,.0f}개  ({int(row['sample_posts'])}개 게시물 기준)")
+                avg_views = row["avg_views"]
+                video_n = row["video_sample_posts"]
+                if pd.isna(avg_views):
+                    st.caption("평균 조회수: 정보 없음 (최근 게시물 중 영상이 없음)")
+                else:
+                    st.caption(f"평균 조회수 {avg_views:,.0f}회  (영상 게시물 {int(video_n)}개 기준 · 참고용, 인게이지먼트율 계산에는 미포함)")
+
+                st.markdown('<p class="panel-label">게시 활발도</p>', unsafe_allow_html=True)
+                st.write(row["activity"])
+                last_post = row["last_post_days_ago"]
+                avg_gap = row["avg_days_between_posts"]
+                act1, act2 = st.columns(2)
+                act1.metric("최근 업로드", "정보 없음" if pd.isna(last_post) else f"{last_post:.1f}일 전")
+                act2.metric("평균 업로드 주기", "정보 없음" if pd.isna(avg_gap) else f"{avg_gap:.1f}일마다")
