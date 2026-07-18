@@ -1,9 +1,21 @@
 {
-  "brand_keywords": ["뷰티", "스킨케어", "패션", "라이프스타일"],
-  "request_delay_seconds": [10, 25],
+  "brand_keywords": [
+    "뷰티",
+    "스킨케어",
+    "패션",
+    "라이프스타일"
+  ],
+  "request_delay_seconds": [
+    10,
+    25
+  ],
   "use_my_chrome_profile": true,
   "chrome_profile_path": "~/AppData/Local/Google/Chrome/User Data",
   "chrome_profile_name": "Profile 6",
   "headless": false,
-  "influencers": ["nike", "chipotle"]
+  "influencers": [
+    "nike",
+    "chipotle",
+    "medicube_korea"
+  ]
 }
