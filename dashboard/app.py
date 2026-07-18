@@ -53,15 +53,18 @@ st.markdown(
        ============================================================ */
     :root {
         --sp-1: 8px;  --sp-2: 16px; --sp-3: 24px; --sp-4: 32px; --sp-5: 40px; --sp-6: 48px;
-        --radius-card: 12px;
-        --radius-control: 8px;
-        --border-color: #e6e3e3;
+        --radius-card: 20px;
+        --radius-control: 10px;
+        --border-color: #EFE6D8;
         --ink-primary: #1a1a1a;
-        --ink-secondary: #62605c;
-        --ink-muted: #8a8781;
+        --ink-secondary: #6b6459;
+        --ink-muted: #8f8879;
         --surface-card: #ffffff;
-        --surface-page: #F5F4F2;
-        --accent: #E5484D;
+        --surface-page: #F7F1E8;
+        --accent: #E85D8E;
+        --accent-tint: #FCE9F0;
+        --accent-tint-border: #F3C2D6;
+        --shadow-card: 0 2px 10px rgba(120, 90, 60, 0.08);
     }
 
     html, body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif !important; }
@@ -162,9 +165,10 @@ st.markdown(
        ============================================================ */
     [data-testid="stSidebar"] [data-testid="stVerticalBlock"][class*="st-key-"] {
         border-radius: var(--radius-card) !important;
-        border-color: var(--border-color) !important;
+        border: none !important;
         background: var(--surface-page) !important;
-        padding: var(--sp-2) !important;
+        box-shadow: var(--shadow-card);
+        padding: var(--sp-3) !important;
         gap: var(--sp-2) !important;
     }
     [data-testid="stSidebar"] [data-testid="stExpander"] { border-radius: var(--radius-card) !important; }
@@ -172,57 +176,83 @@ st.markdown(
     /* 메인 영역의 카드형 컨테이너 (상세 프로필 등) — 흰 배경으로 페이지와 구분 */
     [data-testid="stMain"] [data-testid="stVerticalBlock"][class*="st-key-"] {
         border-radius: var(--radius-card) !important;
-        border-color: var(--border-color) !important;
+        border: none !important;
         background: var(--surface-card) !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-        padding: var(--sp-3) !important;
+        box-shadow: var(--shadow-card);
+        padding: var(--sp-4) !important;
         gap: var(--sp-2) !important;
     }
 
     /* "계정 추가" 패널 강조 — 이 앱에서 유일한 데이터 입력 지점 */
     [data-testid="stSidebar"] [data-testid="stVerticalBlock"].st-key-add-account-panel {
-        background: #FDEDEC !important;
-        border: 1.5px solid #F3B6B4 !important;
+        background: var(--accent-tint) !important;
+        box-shadow: none !important;
+        border: 1.5px solid var(--accent-tint-border) !important;
     }
 
     /* ============================================================
-       지표 카드 (st.metric) — 패딩/반경 통일
+       지표 카드 (st.metric) — 패딩/반경 통일, 그림자 기반 카드
        ============================================================ */
     [data-testid="stMain"] [data-testid="stMetric"] {
-        background: var(--surface-card); border: 1px solid var(--border-color);
+        background: var(--surface-card); border: none;
         border-radius: var(--radius-card);
-        padding: var(--sp-3); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        padding: var(--sp-4); box-shadow: var(--shadow-card);
     }
-    div[data-testid="stMetricValue"] { font-size: 1.5rem; }
+    div[data-testid="stMetricValue"] { font-size: 1.6rem; }
+    [data-testid="stMain"] [data-testid="stVerticalBlock"][class*="st-key-"] div[data-testid="stMetricValue"] {
+        font-size: 1.35rem;
+    }
     [data-testid="stMain"] [data-testid="stMetric"] [data-testid="stMetricLabel"] {
-        color: var(--ink-secondary) !important; font-size: 0.82rem;
+        color: var(--ink-secondary) !important; font-size: 0.84rem; font-weight: 600;
     }
     [data-testid="stMain"] [data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #111 !important; font-weight: 700;
+        color: #111 !important; font-weight: 800;
     }
 
     /* ============================================================
-       탭 — 여백/굵기 통일, 콘텐츠 상단 간격 확보
+       탭 — 세그먼트 필(pill) 컨트롤 스타일
        ============================================================ */
+    [data-testid="stMain"] [data-baseweb="tab-list"] {
+        background: #EFE6D8 !important; border-bottom: none !important;
+        border-radius: var(--radius-control) !important;
+        padding: 4px !important; gap: 4px !important; display: inline-flex !important;
+    }
     [data-testid="stMain"] button[role="tab"], [data-testid="stMain"] button[role="tab"] *,
     [data-testid="stMain"] [data-baseweb="tab-list"] button,
     [data-testid="stMain"] [data-baseweb="tab-list"] button * {
-        color: var(--ink-primary) !important; font-size: 1.0rem !important; font-weight: 700 !important;
+        color: var(--ink-muted) !important; font-size: 0.92rem !important; font-weight: 700 !important;
     }
-    [data-testid="stMain"] button[role="tab"][aria-selected="false"],
-    [data-testid="stMain"] button[role="tab"][aria-selected="false"] * { color: var(--ink-muted) !important; }
-    [data-testid="stMain"] [data-baseweb="tab-list"] { border-bottom: 1px solid #d6d3d3 !important; gap: var(--sp-4) !important; }
+    [data-testid="stMain"] [data-baseweb="tab-list"] button {
+        border-radius: 7px !important; height: 38px !important;
+    }
+    [data-testid="stMain"] button[role="tab"][aria-selected="true"] {
+        background: var(--surface-card) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    }
+    [data-testid="stMain"] button[role="tab"][aria-selected="true"],
+    [data-testid="stMain"] button[role="tab"][aria-selected="true"] * { color: var(--ink-primary) !important; }
+    [data-testid="stMain"] [data-baseweb="tab-highlight"] { display: none !important; }
+    [data-testid="stMain"] [data-baseweb="tab-border"] { display: none !important; }
     [data-testid="stMain"] [data-baseweb="tab-panel"] { padding-top: var(--sp-3) !important; }
 
     /* ============================================================
-       데이터 테이블/카드 컨테이너 공통 반경
+       데이터 테이블/카드 컨테이너 — 그림자 기반, 테두리 없이
        ============================================================ */
     [data-testid="stDataFrame"], [data-testid="stDataEditor"] {
         border-radius: var(--radius-card) !important; overflow: hidden;
-        border: 1px solid var(--border-color) !important;
+        border: none !important; box-shadow: var(--shadow-card);
     }
     [data-testid="stExpander"] {
-        border-radius: var(--radius-card) !important; border-color: var(--border-color) !important;
+        border-radius: var(--radius-card) !important; border: none !important;
+        box-shadow: var(--shadow-card);
+    }
+
+    /* ============================================================
+       매칭 키워드 — 알약(pill) 배지 스타일
+       ============================================================ */
+    .kw-pill {
+        display: inline-block; background: var(--accent-tint); color: #A83E6C;
+        border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; font-weight: 700;
+        margin: 0 6px 6px 0;
     }
     </style>
     """,
@@ -501,35 +531,39 @@ with tab_chart:
     if filtered.empty:
         st.info("표시할 데이터가 없어요.")
     else:
-        scatter = px.scatter(
-            valid_df, x="followers", y="engagement_rate", color="tier",
-            size="fit_score" if "fit_score" in valid_df.columns else None,
-            hover_data={"username": True, "biography": True, "followers": ":,", "engagement_rate": ":.2f"},
-            color_discrete_map=TIER_COLORS,
-            log_x=True,
-            labels={"followers": "팔로워 수 (로그 스케일)", "engagement_rate": "인게이지먼트율 (%)", "tier": "구간"},
-        )
-        scatter.update_layout(
-            plot_bgcolor="#fcfcfb", paper_bgcolor="#fcfcfb",
-            font=dict(family="Pretendard, sans-serif", color="#0b0b0b"),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        )
-        scatter.update_xaxes(gridcolor="#e1e0d9")
-        scatter.update_yaxes(gridcolor="#e1e0d9")
-        st.plotly_chart(scatter, width="stretch")
+        with st.container(border=True, key="scatter-card"):
+            scatter = px.scatter(
+                valid_df, x="followers", y="engagement_rate", color="tier",
+                size="fit_score" if "fit_score" in valid_df.columns else None,
+                hover_data={"username": True, "biography": True, "followers": ":,", "engagement_rate": ":.2f"},
+                color_discrete_map=TIER_COLORS,
+                log_x=True,
+                labels={"followers": "팔로워 수 (로그 스케일)", "engagement_rate": "인게이지먼트율 (%)", "tier": "구간"},
+            )
+            scatter.update_layout(
+                plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+                font=dict(family="Pretendard, sans-serif", color="#1a1a1a"),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                margin=dict(t=20, r=20),
+            )
+            scatter.update_xaxes(gridcolor="#EFE6D8")
+            scatter.update_yaxes(gridcolor="#EFE6D8")
+            st.plotly_chart(scatter, width="stretch")
 
-        hist = px.histogram(
-            valid_df, x="engagement_rate", nbins=20,
-            labels={"engagement_rate": "인게이지먼트율 (%)"},
-            color_discrete_sequence=["#2a78d6"],
-        )
-        hist.update_layout(
-            plot_bgcolor="#fcfcfb", paper_bgcolor="#fcfcfb",
-            font=dict(family="Pretendard, sans-serif", color="#0b0b0b"),
-        )
-        hist.update_xaxes(gridcolor="#e1e0d9")
-        hist.update_yaxes(gridcolor="#e1e0d9", title="계정 수")
-        st.plotly_chart(hist, width="stretch")
+        with st.container(border=True, key="hist-card"):
+            hist = px.histogram(
+                valid_df, x="engagement_rate", nbins=20,
+                labels={"engagement_rate": "인게이지먼트율 (%)"},
+                color_discrete_sequence=["#E85D8E"],
+            )
+            hist.update_layout(
+                plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+                font=dict(family="Pretendard, sans-serif", color="#1a1a1a"),
+                margin=dict(t=20, r=20),
+            )
+            hist.update_xaxes(gridcolor="#EFE6D8")
+            hist.update_yaxes(gridcolor="#EFE6D8", title="계정 수")
+            st.plotly_chart(hist, width="stretch")
 
 with tab_detail:
     if valid_df.empty:
@@ -565,7 +599,7 @@ with tab_detail:
                 kws = row["matched_keywords"]
                 if kws:
                     st.markdown('<p class="panel-label">매칭된 브랜드 키워드</p>', unsafe_allow_html=True)
-                    st.markdown(" ".join(f"`{k}`" for k in kws))
+                    st.markdown(" ".join(f'<span class="kw-pill">{k}</span>' for k in kws), unsafe_allow_html=True)
 
                 st.markdown('<p class="panel-label">최근 게시물 기준 평균</p>', unsafe_allow_html=True)
                 st.write(f"좋아요 {row['avg_likes']:,.0f}회 · 댓글 {row['avg_comments']:,.0f}개  ({int(row['sample_posts'])}개 게시물 기준)")
