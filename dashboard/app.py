@@ -255,6 +255,51 @@ st.markdown(
         border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; font-weight: 700;
         margin: 0 6px 6px 0;
     }
+
+    /* ============================================================
+       순위표 (수동 렌더) — 헤더/구분선
+       ============================================================ */
+    .table-head {
+        font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+        text-transform: uppercase; color: var(--ink-muted); margin: 0;
+    }
+    .table-rule { border: none; border-top: 1px solid var(--border-color); margin: 8px 0 4px; }
+    [data-testid="stMain"] [data-testid="stVerticalBlock"].st-key-rank-table [data-testid="stHorizontalBlock"] {
+        align-items: center !important;
+    }
+
+    /* ============================================================
+       컨택여부 — 옵션별 색상 버튼 (1=컨택예정 amber, 2=컨택완료 green, 3=미진행 회색)
+       ============================================================ */
+    [class*="st-key-contact-"] div[data-testid="stButton"] button {
+        border-radius: 999px !important; min-height: 32px !important; height: 32px !important;
+        font-size: 0.76rem !important; font-weight: 700 !important; padding: 2px 6px !important;
+        border: 1px solid transparent !important; white-space: nowrap !important;
+    }
+    [class*="st-key-contact-"] div[data-testid="stButton"] button p {
+        white-space: nowrap !important; font-size: 0.76rem !important; overflow: visible !important;
+    }
+    [class*="st-key-contact-"] [data-testid="stHorizontalBlock"] { gap: 6px !important; flex-wrap: nowrap !important; }
+    [class*="st-key-contact-"] div[data-testid="stColumn"] { min-width: 0 !important; }
+
+    [class*="st-key-contact-"] div[data-testid="stColumn"]:nth-of-type(1) button[kind="secondary"] {
+        background: #FBF1D6 !important; color: #8A6100 !important; border-color: #EAD692 !important;
+    }
+    [class*="st-key-contact-"] div[data-testid="stColumn"]:nth-of-type(1) button[kind="primary"] {
+        background: #E0A230 !important; color: #fff !important;
+    }
+    [class*="st-key-contact-"] div[data-testid="stColumn"]:nth-of-type(2) button[kind="secondary"] {
+        background: var(--flow-cloud-soft, #E7F1EA) !important; color: #3F7A55 !important; border-color: #BFE0CC !important;
+    }
+    [class*="st-key-contact-"] div[data-testid="stColumn"]:nth-of-type(2) button[kind="primary"] {
+        background: #4C8863 !important; color: #fff !important;
+    }
+    [class*="st-key-contact-"] div[data-testid="stColumn"]:nth-of-type(3) button[kind="secondary"] {
+        background: #F1EDE4 !important; color: #6b6459 !important; border-color: #E3DACB !important;
+    }
+    [class*="st-key-contact-"] div[data-testid="stColumn"]:nth-of-type(3) button[kind="primary"] {
+        background: #8F8879 !important; color: #fff !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -314,7 +359,7 @@ def enrich(df: pd.DataFrame, keywords: list[str]) -> pd.DataFrame:
     df["matched_keywords"] = df.apply(
         lambda r: scoring.matched_keywords(r["biography"], r["category_name"], keywords), axis=1
     )
-    df["matched_keywords_str"] = df["matched_keywords"].apply(lambda ks: ", ".join(ks) if ks else "-")
+    df["matched_keywords_str"] = df["matched_keywords"].apply(lambda ks: ", ".join(ks) if ks else "–")
     df["activity"] = df["avg_days_between_posts"].apply(
         lambda v: scoring.activity_label(None if pd.isna(v) else v)
     )
@@ -490,39 +535,55 @@ with tab_rank:
     if filtered.empty:
         st.info("조건에 맞는 계정이 없어요. 필터를 완화해보세요.")
     else:
-        table = filtered[[
+        col_ratios = [1.2, 0.8, 0.6, 0.9, 0.8, 1.0, 0.7, 0.9, 3.4, 0.6]
+        headers = ["계정", "팔로워", "구간", "인게이지먼트율(%)", "조회수",
+                   "매칭 키워드", "활발도", "핏 스코어", "컨택여부", "프로필"]
+
+        with st.container(border=True, key="rank-table"):
+            hcols = st.columns(col_ratios)
+            for hcol, label in zip(hcols, headers):
+                hcol.markdown(f'<p class="table-head">{label}</p>', unsafe_allow_html=True)
+            st.markdown('<hr class="table-rule" />', unsafe_allow_html=True)
+
+            for _, r in filtered.iterrows():
+                username = r["username"]
+                rcols = st.columns(col_ratios)
+                rcols[0].markdown(f"**{username}**")
+                rcols[1].write(f"{int(r['followers']):,}")
+                rcols[2].write(r["tier"])
+                rcols[3].write(f"{r['engagement_rate']:.2f}")
+                rcols[4].write("–" if pd.isna(r["avg_views"]) else f"{r['avg_views']:,.0f}")
+                rcols[5].write(r["matched_keywords_str"])
+                rcols[6].write(r["activity"])
+                with rcols[7]:
+                    st.progress(min(1.0, r["fit_score"] / 100), text=f"{r['fit_score']:.1f}")
+                with rcols[8]:
+                    with st.container(key=f"contact-{username}"):
+                        bcols = st.columns(3, gap="small")
+                        for i, status in enumerate(CONTACT_OPTIONS):
+                            is_active = (r["contact_status"] == status)
+                            clicked = bcols[i].button(
+                                status, key=f"contact_{username}_{status}",
+                                type="primary" if is_active else "secondary",
+                                width="stretch",
+                            )
+                            if clicked and not is_active:
+                                save_contact_status(username, status)
+                                st.rerun()
+                rcols[9].link_button("🔗 열기", f"https://instagram.com/{username}", width="stretch")
+
+        csv_df = filtered[[
             "username", "followers", "tier", "engagement_rate", "avg_views",
             "matched_keywords_str", "activity", "fit_score", "contact_status",
-        ]].copy()
-        table["프로필"] = "https://instagram.com/" + filtered["username"]
-        table = table.rename(columns={
+        ]].rename(columns={
             "username": "계정", "followers": "팔로워", "tier": "구간",
             "engagement_rate": "인게이지먼트율(%)", "avg_views": "평균 조회수",
-            "matched_keywords_str": "매칭 키워드",
-            "activity": "게시 활발도", "fit_score": "핏 스코어",
-            "contact_status": "컨택여부",
+            "matched_keywords_str": "매칭 키워드", "activity": "게시 활발도",
+            "fit_score": "핏 스코어", "contact_status": "컨택여부",
         })
-        edited_table = st.data_editor(
-            table, width="stretch", height=460, hide_index=True,
-            disabled=[c for c in table.columns if c != "컨택여부"],
-            column_config={
-                "핏 스코어": st.column_config.ProgressColumn("핏 스코어", min_value=0, max_value=100, format="%.1f"),
-                "팔로워": st.column_config.NumberColumn("팔로워", format="%d"),
-                "평균 조회수": st.column_config.NumberColumn("평균 조회수", format="%d", help="최근 영상(릴스) 게시물 기준 · 참고용, 인게이지먼트율 계산에는 미포함"),
-                "프로필": st.column_config.LinkColumn("프로필", display_text="🔗 인스타 열기"),
-                "컨택여부": st.column_config.SelectboxColumn("컨택여부", options=CONTACT_OPTIONS, required=True),
-            },
-            key="rank_table_editor",
-        )
-        changed = edited_table[edited_table["컨택여부"] != table["컨택여부"]]
-        if not changed.empty:
-            for _, r in changed.iterrows():
-                save_contact_status(r["계정"], r["컨택여부"])
-            st.rerun()
-
         st.download_button(
             "⬇️ 현재 목록 CSV로 내려받기 (컨택 후보 리스트)",
-            data=edited_table.to_csv(index=False).encode("utf-8-sig"),
+            data=csv_df.to_csv(index=False).encode("utf-8-sig"),
             file_name="influencer_shortlist.csv",
             mime="text/csv",
             type="primary",
